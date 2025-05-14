@@ -7,7 +7,7 @@ this app guides users to:
 - Get random suggestions when overwhelmed
 - Stay motivated with deadline-based notifications
 
-**[Watch Demo Video](https://drive.google.com/file/d/1Z4mGczDmBmkSJ4HE-x0XEZDuQrgz8ieF/view?usp=drive_link)**
+**[Watch Demo Video](https://drive.google.com/file/d/1FoFMJ3zDFspFpn5SLYIVXvXRGkPYzCL-/view?usp=drive_link)**
 
 ## Features
 - View habit list sorted by creation date
