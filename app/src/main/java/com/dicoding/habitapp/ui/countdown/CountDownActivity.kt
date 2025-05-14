@@ -6,9 +6,20 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat.getParcelableExtra
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.dicoding.habitapp.R
 import com.dicoding.habitapp.data.Habit
+import com.dicoding.habitapp.notification.NotificationWorker
 import com.dicoding.habitapp.utils.HABIT
+import com.dicoding.habitapp.utils.HABIT_ID
+import com.dicoding.habitapp.utils.HABIT_TITLE
+import com.dicoding.habitapp.utils.NOTIFICATION_CHANNEL_ID
+import com.dicoding.habitapp.utils.NOTIF_UNIQUE_WORK
+import java.util.concurrent.TimeUnit
 
 class CountDownActivity : AppCompatActivity() {
 
@@ -37,13 +48,38 @@ class CountDownActivity : AppCompatActivity() {
 
 
             //TODO 13 : Start and cancel One Time Request WorkManager to notify when time is up.
+            val channelName = getString(R.string.notify_channel_name)
+            val workManager = WorkManager.getInstance(this)
+
+            val constraints = Constraints.Builder()
+                .setRequiresBatteryNotLow(true)
+                .build()
+
+            val inputData = Data.Builder()
+                .putInt(HABIT_ID,habit.id)
+                .putString(HABIT_TITLE,habit.title)
+                .putString(NOTIFICATION_CHANNEL_ID,channelName)
+                .build()
+
+            val notificationRequest = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+                .setInputData(inputData)
+                .setInitialDelay(habit.minutesFocus * 60 * 1000, TimeUnit.MILLISECONDS)
+                .setConstraints(constraints)
+                .addTag(NOTIF_UNIQUE_WORK)
+                .build()
 
             findViewById<Button>(R.id.btn_start).setOnClickListener {
-
+                viewModel.startTimer()
+                workManager.enqueueUniqueWork(
+                    NOTIF_UNIQUE_WORK,
+                    ExistingWorkPolicy.REPLACE,
+                    notificationRequest
+                )
             }
 
             findViewById<Button>(R.id.btn_stop).setOnClickListener {
-
+                viewModel.resetTimer()
+                workManager.cancelAllWork()
             }
         }
 
